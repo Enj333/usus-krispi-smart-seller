@@ -23,7 +23,20 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('name')
+                    ->required(),
+
+                Forms\Components\Textarea::make('description'),
+
+                Forms\Components\TextInput::make('price')
+                    ->numeric()
+                    ->required(),
+
+                Forms\Components\TextInput::make('stock')
+                    ->numeric()
+                    ->required(),
+
+                Forms\Components\TextInput::make('variant'),
             ]);
     }
 
