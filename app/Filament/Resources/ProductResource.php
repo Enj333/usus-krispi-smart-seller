@@ -37,6 +37,15 @@ class ProductResource extends Resource
                     ->required(),
 
                 Forms\Components\TextInput::make('variant'),
+
+                Forms\Components\FileUpload::make('image')
+                    ->image()
+                    ->disk('public')
+                    ->directory('products')
+                    ->visibility('public')
+                    ->imageEditor()
+                    ->preserveFilenames()
+                    ->nullable(),
             ]);
     }
 
@@ -44,7 +53,18 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\ImageColumn::make('image')
+                    ->square(),
+
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('variant'),
+
+                Tables\Columns\TextColumn::make('price')
+                    ->money('IDR'),
+
+                Tables\Columns\TextColumn::make('stock'),
             ])
             ->filters([
                 //
