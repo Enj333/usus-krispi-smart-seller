@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $products = Product::all();
-
-        $cart = session()->get('cart', []);
-
-        return view('home', compact('products', 'cart'));
+        return Inertia::render('Welcome', [
+            'products' => Product::all(),
+            'cart' => Session::get('cart', [])
+        ]);
     }
 }
