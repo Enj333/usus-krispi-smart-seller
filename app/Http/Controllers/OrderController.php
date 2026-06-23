@@ -102,7 +102,46 @@ class OrderController extends Controller
 
         Session::forget('cart');
 
-        return redirect('/')
+        return redirect()->route('order.success', ['order' => $order->id])
             ->with('success', 'Pesanan berhasil dibuat');
+    }
+
+    public function success(Order $order)
+    {
+        $order->load('orderItems.product');
+        return \Inertia\Inertia::render('OrderSuccess', [
+            'order' => $order,
+        ]);
+    }
+
+    public function simulatePayment(Order $order)
+    {
+        if ($order->payment_status !== 'lunas') {
+            $order->update([
+                'payment_status' => 'lunas',
+            ]);
+
+            $message = "💳 SIMULASI BAYAR QRIS LUNAS\n\n";
+            $message .= "👤 Nama: {$order->customer_name}\n";
+            $message .= "📱 No HP: {$order->phone}\n";
+            $message .= "💰 Total: Rp " . number_format($order->total_price, 0, ',', '.') . "\n";
+            $message .= "✅ Status Pembayaran: LUNAS via QRIS";
+
+            try {
+                Http::post(
+                    "https://api.telegram.org/bot" .
+                        config('services.telegram.token') .
+                        "/sendMessage",
+                    [
+                        'chat_id' => config('services.telegram.chat_id'),
+                        'text' => $message,
+                    ]
+                );
+            } catch (\Exception $e) {
+                // Ignore telegram errors
+            }
+        }
+
+        return redirect()->back()->with('success', 'Simulasi pembayaran QRIS berhasil!');
     }
 }

@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { ShoppingCart, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, X, Info } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CartSidebar({ cart, onClose }) {
@@ -12,6 +12,7 @@ export default function CartSidebar({ cart, onClose }) {
     const [customerName, setCustomerName] = useState('');
     const [phone, setPhone] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('cash');
+
     const handleCheckout = () => {
         if (!customerName || !phone) {
             alert('Nama dan nomor WhatsApp harus diisi!');
@@ -22,140 +23,180 @@ export default function CartSidebar({ cart, onClose }) {
             customer_name: customerName,
             phone: phone,
             payment_method: paymentMethod,
+        }, {
+            onSuccess: () => {
+                onClose();
+            }
         });
     };
 
     return (
-        <div className="fixed right-6 top-1/2 -translate-y-1/2 w-[340px] bg-zinc-900 border border-zinc-800 rounded-[35px] p-6 shadow-2xl z-50">
-            <button
-                onClick={onClose}
-                className="absolute top-4 right-4 text-white text-xl"
-            >
-                ✕
-            </button>
-            {/* HEADER */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-black text-white">Cart</h2>
-
-                    <p className="text-zinc-400 text-sm">Pesanan kamu</p>
-                </div>
-
-                <div className="bg-orange-500 w-12 h-12 rounded-full flex items-center justify-center">
-                    <ShoppingCart className="text-white" />
-                </div>
-            </div>
-
-            {/* ITEMS */}
-            <div className="mt-8 space-y-5">
-                {cartItems.length === 0 ? (
-                    <div className="text-center py-10 text-zinc-400">
-                        Cart masih kosong
+        <div className="fixed right-0 top-0 h-screen w-full max-w-[440px] bg-slate-950 text-white shadow-2xl z-50 p-6 flex flex-col justify-between border-l border-slate-900 overflow-y-auto">
+            <div>
+                {/* HEADER */}
+                <div className="flex items-center justify-between border-b border-slate-900 pb-5">
+                    <div>
+                        <h2 className="text-2xl font-black text-white tracking-wide">Keranjang</h2>
+                        <p className="text-slate-400 text-xs font-semibold mt-0.5">Rincian pesanan Anda</p>
                     </div>
-                ) : (
-                    cartItems.map((item) => (
-                        <div
-                            key={item.id}
-                            className="flex gap-4 bg-zinc-800 rounded-2xl p-3"
-                        >
-                            <img
-                                src={`/storage/${item.image}`}
-                                alt={item.name}
-                                className="w-20 h-20 rounded-2xl object-cover"
-                            />
-
-                            <div className="flex-1">
-                                <h3 className="text-white font-bold">
-                                    {item.name}
-                                </h3>
-
-                                <p className="text-orange-400 mt-1">
-                                    Rp{' '}
-                                    {Number(item.price).toLocaleString('id-ID')}
-                                </p>
-
-                                <div className="flex items-center gap-3 mt-3">
-                                    <button
-                                        onClick={() =>
-                                            router.post(
-                                                `/cart/decrease/${item.id}`
-                                            )
-                                        }
-                                        className="bg-zinc-700 w-8 h-8 rounded-full flex items-center justify-center"
-                                    >
-                                        <Minus size={16} />
-                                    </button>
-
-                                    <span className="text-white">
-                                        {item.quantity}
-                                    </span>
-
-                                    <button
-                                        onClick={() =>
-                                            router.post(
-                                                `/cart/add/${item.id}`,
-                                                {},
-                                                {
-                                                    preserveScroll: true,
-                                                    preserveState: true,
-                                                }
-                                            )
-                                        }
-                                        className="bg-orange-500 w-8 h-8 rounded-full flex items-center justify-center"
-                                    >
-                                        <Plus size={16} />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
-
-            {/* TOTAL */}
-            <div className="mt-8 border-t border-zinc-800 pt-6">
-                <div className="flex justify-between items-center">
-                    <p className="text-zinc-400">Total</p>
-
-                    <h3 className="text-3xl font-black text-white">
-                        Rp {total.toLocaleString('id-ID')}
-                    </h3>
-                </div>
-
-                <div className="mt-5 space-y-3">
-                    <input
-                        type="text"
-                        placeholder="Nama"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        className="w-full bg-zinc-800 rounded-xl px-4 py-3 text-white"
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="Nomor WhatsApp"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full bg-zinc-800 rounded-xl px-4 py-3 text-white"
-                    />
-
-                    <select
-                        value={paymentMethod}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-full bg-zinc-800 rounded-xl px-4 py-3 text-white"
-                    >
-                        <option value="cash">Cash</option>
-                        <option value="qris">QRIS</option>
-                    </select>
 
                     <button
-                        onClick={handleCheckout}
-                        className="w-full bg-orange-500 hover:bg-orange-600 transition py-4 rounded-full text-white font-black text-lg"
+                        onClick={onClose}
+                        className="text-slate-400 hover:text-white p-2 hover:bg-slate-900 rounded-xl transition"
                     >
-                        Checkout
+                        <X size={20} />
                     </button>
                 </div>
+
+                {/* SELF PICK-UP INFO BANNER */}
+                <div className="mt-6 bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4 flex gap-3 items-start">
+                    <Info className="text-orange-500 shrink-0 mt-0.5" size={18} />
+                    <div>
+                        <p className="text-orange-500 font-black text-xs uppercase tracking-wider">Metode: Ambil di Booth</p>
+                        <p className="text-slate-400 text-xs mt-1 leading-relaxed">
+                            Pesanan diproses secara online dan diambil langsung di booth kami. Tunjukkan nomor WhatsApp Anda saat pengambilan.
+                        </p>
+                    </div>
+                </div>
+
+                {/* ITEMS */}
+                <div className="mt-6 space-y-4">
+                    {cartItems.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                            <div className="w-32 h-32 bg-slate-900/40 rounded-full flex items-center justify-center border border-slate-900">
+                                <img
+                                    src="/images/fox_mascot.png"
+                                    alt="Empty Cart Mascot"
+                                    className="w-24 h-24 object-contain opacity-55 animate-bounce"
+                                />
+                            </div>
+                            <p className="text-slate-500 font-black text-sm">Keranjang masih kosong</p>
+                        </div>
+                    ) : (
+                        cartItems.map((item) => (
+                            <div
+                                key={item.id}
+                                className="flex gap-4 bg-slate-900 border border-slate-850 rounded-2xl p-3.5 items-center"
+                            >
+                                <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-950/60 shrink-0 border border-slate-800">
+                                    {item.image ? (
+                                        <img
+                                            src={`/storage/${item.image}`}
+                                            alt={item.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <img
+                                            src="/images/fox_mascot.png"
+                                            className="w-10 h-10 object-contain mx-auto mt-3 opacity-40"
+                                        />
+                                    )}
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="text-white font-bold text-sm truncate">
+                                        {item.name}
+                                    </h3>
+
+                                    <p className="text-orange-500 font-bold text-xs mt-0.5">
+                                        Rp {Number(item.price).toLocaleString('id-ID')}
+                                    </p>
+
+                                    <div className="flex items-center gap-3 mt-2">
+                                        <button
+                                            onClick={() =>
+                                                router.post(
+                                                    `/cart/decrease/${item.id}`,
+                                                    {},
+                                                    { preserveScroll: true }
+                                                )
+                                            }
+                                            className="bg-slate-800 hover:bg-slate-700 text-slate-300 w-7 h-7 rounded-lg flex items-center justify-center transition"
+                                        >
+                                            <Minus size={14} />
+                                        </button>
+
+                                        <span className="text-white font-black text-sm w-4 text-center">
+                                            {item.quantity}
+                                        </span>
+
+                                        <button
+                                            onClick={() =>
+                                                router.post(
+                                                    `/cart/add/${item.id}`,
+                                                    {},
+                                                    {
+                                                        preserveScroll: true,
+                                                        preserveState: true,
+                                                    }
+                                                )
+                                            }
+                                            className="bg-orange-500 hover:bg-orange-600 text-white w-7 h-7 rounded-lg flex items-center justify-center transition"
+                                        >
+                                            <Plus size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
+
+            {/* TOTAL & CHECKOUT FORM */}
+            {cartItems.length > 0 && (
+                <div className="mt-8 border-t border-slate-900 pt-6 space-y-6">
+                    <div className="flex justify-between items-center">
+                        <p className="text-slate-400 font-bold text-sm">Total Belanja</p>
+                        <h3 className="text-2xl font-black text-orange-500">
+                            Rp {total.toLocaleString('id-ID')}
+                        </h3>
+                    </div>
+
+                    <div className="space-y-3">
+                        <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nama Lengkap</label>
+                            <input
+                                type="text"
+                                placeholder="Masukkan nama Anda"
+                                value={customerName}
+                                onChange={(e) => setCustomerName(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 text-sm mt-1.5 focus:outline-none focus:border-orange-500/50 transition"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nomor WhatsApp</label>
+                            <input
+                                type="text"
+                                placeholder="Contoh: 081234567890"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 text-sm mt-1.5 focus:outline-none focus:border-orange-500/50 transition"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Metode Pembayaran</label>
+                            <select
+                                value={paymentMethod}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm mt-1.5 focus:outline-none focus:border-orange-500/50 transition cursor-pointer"
+                            >
+                                <option value="cash">Bayar Tunai di Booth (Cash)</option>
+                                <option value="qris">Scan QRIS di Booth (QRIS)</option>
+                            </select>
+                        </div>
+
+                        <button
+                            onClick={handleCheckout}
+                            className="w-full bg-orange-500 hover:bg-orange-600 transition-all duration-300 py-4 rounded-2xl text-white font-black text-md shadow-lg shadow-orange-500/20 active:scale-[0.98] mt-3"
+                        >
+                            Konfirmasi Pesanan
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
