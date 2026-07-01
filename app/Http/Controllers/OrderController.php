@@ -16,7 +16,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'customer_name' => 'required',
-            'phone' => 'required',
+            'phone' => 'nullable',
             'payment_method' => 'required',
         ]);
 
@@ -77,7 +77,7 @@ class OrderController extends Controller
             $message = "🔔 ORDER BARU\n\n";
 
             $message .= "👤 Nama: {$order->customer_name}\n";
-            $message .= "📱 No HP: {$order->phone}\n\n";
+            $message .= "📱 No HP: " . ($order->phone ?: '-') . "\n\n";
 
             foreach ($cart as $item) {
 
@@ -123,7 +123,7 @@ class OrderController extends Controller
 
             $message = "💳 SIMULASI BAYAR QRIS LUNAS\n\n";
             $message .= "👤 Nama: {$order->customer_name}\n";
-            $message .= "📱 No HP: {$order->phone}\n";
+            $message .= "📱 No HP: " . ($order->phone ?: '-') . "\n";
             $message .= "💰 Total: Rp " . number_format($order->total_price, 0, ',', '.') . "\n";
             $message .= "✅ Status Pembayaran: LUNAS via QRIS";
 

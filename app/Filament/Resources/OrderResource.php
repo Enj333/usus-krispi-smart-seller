@@ -69,42 +69,81 @@ class OrderResource extends Resource
             ])
 
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('No. Order')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('customer_name')
+                    ->label('Nama Pelanggan')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('phone'),
+                Tables\Columns\TextColumn::make('phone')
+                    ->label('No. WhatsApp'),
+
+                Tables\Columns\TextColumn::make('items_summary')
+                    ->label('Detail Menu')
+                    ->getStateUsing(function ($record) {
+                        return $record->orderItems->map(function ($item) {
+                            return ($item->product->name ?? 'Produk') . ' (x' . $item->quantity . ')';
+                        })->implode(', ');
+                    })
+                    ->wrap(),
 
                 Tables\Columns\TextColumn::make('total_price')
-                    ->money('IDR'),
-
-                Tables\Columns\TextColumn::make('id')
+                    ->label('Total Harga')
+                    ->money('IDR')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime('d M Y H:i')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('status')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'diproses' => 'primary',
-                        'selesai' => 'success',
-                        'dibatalkan' => 'danger',
-                    }),
+                Tables\Columns\SelectColumn::make('status')
+                    ->label('Status Pesanan')
+                    ->options([
+                        'pending' => 'Pending',
+                        'diproses' => 'Diproses',
+                        'selesai' => 'Selesai',
+                        'dibatalkan' => 'Dibatalkan',
+                    ])
+                    ->selectablePlaceholder(false),
 
                 Tables\Columns\TextColumn::make('payment_method')
+                    ->label('Pembayaran')
                     ->badge(),
 
-                Tables\Columns\TextColumn::make('payment_status')
-                    ->badge()
-                    ->color(fn(string $state) => match ($state) {
-                        'lunas' => 'success',
-                        default => 'danger',
-                    }),
+                Tables\Columns\SelectColumn::make('payment_status')
+                    ->label('Status Pembayar')
+                    ->options([
+                        'belum_bayar' => 'Belum Bayar',
+                        'lunas' => 'Lunas',
+                    ])
+                    ->selectablePlaceholder(false),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Tanggal Order')
+                    ->dateTime('d M Y H:i')
+                    ->sortable(),
             ])
 
             ->actions([
+                Tables\Actions\Action::make('proses')
+                    ->label('Proses')
+                    ->color('info')
+                    ->icon('heroicon-o-arrow-path')
+                    ->visible(fn ($record) => $record->status === 'pending')
+                    ->action(function ($record) {
+                        $record->update(['status' => 'diproses']);
+                    }),
+
+                Tables\Actions\Action::make('selesai')
+                    ->label('Selesai')
+                    ->color('success')
+                    ->icon('heroicon-o-check-circle')
+                    ->visible(fn ($record) => $record->status === 'diproses')
+                    ->action(function ($record) {
+                        $record->update([
+                            'status' => 'selesai',
+                            'payment_status' => 'lunas',
+                        ]);
+                    }),
+
                 Tables\Actions\EditAction::make(),
             ]);
     }

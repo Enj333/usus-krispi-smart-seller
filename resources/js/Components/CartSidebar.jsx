@@ -14,8 +14,8 @@ export default function CartSidebar({ cart, onClose }) {
     const [paymentMethod, setPaymentMethod] = useState('cash');
 
     const handleCheckout = () => {
-        if (!customerName || !phone) {
-            alert('Nama dan nomor WhatsApp harus diisi!');
+        if (!customerName) {
+            alert('Nama harus diisi!');
             return;
         }
 
@@ -166,10 +166,10 @@ export default function CartSidebar({ cart, onClose }) {
                         </div>
 
                         <div>
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nomor WhatsApp</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nomor WhatsApp (Opsional)</label>
                             <input
                                 type="text"
-                                placeholder="Contoh: 081234567890"
+                                placeholder="Contoh: 081234567890 (Boleh dikosongkan)"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                                 className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 text-sm mt-1.5 focus:outline-none focus:border-orange-500/50 transition"
